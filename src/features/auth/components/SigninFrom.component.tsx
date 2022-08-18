@@ -10,11 +10,38 @@ import {
 import { textTransform } from "@mui/system";
 import { FC, FormEvent } from "react";
 import { Link } from "react-router-dom";
+import { useInput } from "../../../hooks/input/useInput";
+import { validateEmail } from "../../../shared/utils/validate/email";
+import { ValidatePasswordLength } from "../../../shared/utils/validate/length";
+import { NewUser } from "../models/NewUser";
 
 const SignInFormComponent: FC = () => {
+  const {
+    text: email,
+    textChangeHandler: emailTextChangeHandler,
+    blurChangeHandler: emailBlurHandler,
+    clearChangeHandler: emailClearHandler,
+    shouldDisplayError: emailError,
+  } = useInput(validateEmail);
+
+  const {
+    text: password,
+    textChangeHandler: passwordTextChangeHandler,
+    blurChangeHandler: passwordBlurHandler,
+    clearChangeHandler: passwordClearHandler,
+    shouldDisplayError: passwordError,
+  } = useInput(ValidatePasswordLength);
   const onSubmitHanlder = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("clicked");
+
+    if (emailError || passwordError) return;
+
+    const newUser: NewUser = {
+      email,
+      password,
+    };
+
+    console.log(newUser);
   };
   return (
     <>
@@ -40,6 +67,15 @@ const SignInFormComponent: FC = () => {
               Email
             </InputLabel>
             <TextField
+              value={email}
+              onChange={emailTextChangeHandler}
+              onBlur={emailBlurHandler}
+              error={emailError}
+              helperText={
+                emailError
+                  ? "Email should be following the pattern of email"
+                  : ""
+              }
               type="email"
               name="email"
               id="email"
@@ -54,6 +90,13 @@ const SignInFormComponent: FC = () => {
               Password
             </InputLabel>
             <TextField
+              value={password}
+              onChange={passwordTextChangeHandler}
+              onBlur={passwordBlurHandler}
+              error={passwordError}
+              helperText={
+                passwordError ? "password should be more than 6 characters" : ""
+              }
               type="password"
               name="password"
               id="password"

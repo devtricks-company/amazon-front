@@ -10,11 +10,59 @@ import {
 import { textTransform } from "@mui/system";
 import { FC, FormEvent } from "react";
 import { Link } from "react-router-dom";
+import { useInput } from "../../../hooks/input/useInput";
+import { validateEmail } from "../../../shared/utils/validate/email";
+import {
+  validateNameLength,
+  ValidatePasswordLength,
+} from "../../../shared/utils/validate/length";
+import { NewUser } from "../models/NewUser";
 
 const RegisterationFromCompoenet: FC = () => {
+  const {
+    text: name,
+    textChangeHandler: nameTextChangeHandler,
+    blurChangeHandler: nameBlurHandler,
+    clearChangeHandler: nameClearHandler,
+    shouldDisplayError: nameError,
+  } = useInput(validateNameLength);
+
+  const {
+    text: email,
+    textChangeHandler: emailTextChangeHandler,
+    blurChangeHandler: emailBlurHandler,
+    clearChangeHandler: emailClearHandler,
+    shouldDisplayError: emailError,
+  } = useInput(validateEmail);
+
+  const {
+    text: password,
+    textChangeHandler: passwordTextChangeHandler,
+    blurChangeHandler: passwordBlurHandler,
+    clearChangeHandler: passwordClearHandler,
+    shouldDisplayError: passwordError,
+  } = useInput(ValidatePasswordLength);
+
+  const {
+    text: confirmPassword,
+    textChangeHandler: confirmPasswordTextChangeHandler,
+    blurChangeHandler: confirmPasswordBlurHandler,
+    clearChangeHandler: confirmPasswordClearHandler,
+    shouldDisplayError: confirmPasswordError,
+  } = useInput(ValidatePasswordLength);
+
   const onSubmitHanlder = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("clicked");
+    if (confirmPassword !== password) return;
+    if (nameError || emailError || passwordError) return;
+
+    const newUser: NewUser = {
+      name,
+      email,
+      password,
+    };
+
+    console.log(newUser);
   };
   return (
     <Box
@@ -39,6 +87,13 @@ const RegisterationFromCompoenet: FC = () => {
             Your Name
           </InputLabel>
           <TextField
+            value={name}
+            onChange={nameTextChangeHandler}
+            onBlur={nameBlurHandler}
+            error={nameError}
+            helperText={
+              nameError ? "Your name should be more than 2 characters" : ""
+            }
             type="text"
             name="name"
             id="name"
@@ -53,6 +108,13 @@ const RegisterationFromCompoenet: FC = () => {
             Email
           </InputLabel>
           <TextField
+            value={email}
+            onChange={emailTextChangeHandler}
+            onBlur={emailBlurHandler}
+            error={emailError}
+            helperText={
+              emailError ? "Email should be following the pattern of email" : ""
+            }
             type="email"
             name="email"
             id="email"
@@ -67,6 +129,13 @@ const RegisterationFromCompoenet: FC = () => {
             Password
           </InputLabel>
           <TextField
+            value={password}
+            onChange={passwordTextChangeHandler}
+            onBlur={passwordBlurHandler}
+            error={passwordError}
+            helperText={
+              passwordError ? "password should be more than 6 characters" : ""
+            }
             type="password"
             name="password"
             id="password"
@@ -81,6 +150,15 @@ const RegisterationFromCompoenet: FC = () => {
             Re-enterd password
           </InputLabel>
           <TextField
+            value={confirmPassword}
+            onChange={confirmPasswordTextChangeHandler}
+            onBlur={confirmPasswordBlurHandler}
+            error={confirmPassword !== password}
+            helperText={
+              confirmPasswordError
+                ? "confirm password must be equal to password"
+                : ""
+            }
             type="password"
             name="confrimPassword"
             id="confrimPassword"
