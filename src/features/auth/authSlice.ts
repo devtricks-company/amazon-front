@@ -1,9 +1,9 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { DisplayUser } from "./models/DisplayUser.interface";
+import axios from "axios";
+import { DisplayUser } from "./models/displayuser.interface";
 import { Jwt } from "./models/jwt";
 import { NewUser } from "./models/NewUser";
-import authServiec from "./services/auth.service";
-
+import authServices from "./services/auth.services";
 interface AsyncState {
   isLoading?: boolean;
   isSuccess?: boolean;
@@ -25,25 +25,28 @@ const initialState: AuthState = {
   isError: false,
 };
 
+//redux thunk : is an action that use async command
+
 export const register = createAsyncThunk(
-  "auth/register",
-  (user: NewUser, thunkApi) => {
+  `auth/register`,
+  async (user: NewUser, thunkApi) => {
     try {
-      return authServiec.register(user);
+      return authServices.register(user);
     } catch (error) {
-      return thunkApi.rejectWithValue("register failed");
+      return thunkApi.rejectWithValue(`register not success`);
     }
   }
 );
+//2 - is a regular actions
 
 export const authSlice = createSlice({
   name: "auth",
   initialState: initialState,
   reducers: {
-    reset: (state: AuthState) => {
+    reset: (state) => {
       state.isLoading = false;
-      state.isError = false;
       state.isSuccess = false;
+      state.isError = false;
     },
   },
   extraReducers: (builder) => {

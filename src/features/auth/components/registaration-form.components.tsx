@@ -8,6 +8,7 @@ import {
   Divider,
   CircularProgress,
 } from "@mui/material";
+import { textTransform } from "@mui/system";
 import { FC, FormEvent, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useInput } from "../../../hooks/input/useInput";
@@ -54,18 +55,17 @@ const RegisterationFromCompoenet: FC = () => {
   } = useInput(ValidatePasswordLength);
 
   const dispatch = useAppDispatch();
-  const { isLoading, isError, isSuccess } = useAppSelector(
-    (state) => state.auth
-  );
-
+  const { isLoading, isSuccess } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
+
   useEffect(() => {
-    if (isSuccess) {
+    if (isLoading) {
       dispatch(reset());
       clearForm();
       navigate("/signin");
     }
-  }, [isSuccess, dispatch]);
+  }, [isLoading, dispatch]);
+
   const clearForm = () => {
     nameClearHandler();
     emailClearHandler();
