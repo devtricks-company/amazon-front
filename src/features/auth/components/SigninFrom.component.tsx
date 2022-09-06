@@ -6,16 +6,41 @@ import {
   Typography,
   Button,
   Divider,
+  CircularProgress,
 } from "@mui/material";
 import { textTransform } from "@mui/system";
-import { FC, FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { FC, FormEvent, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useInput } from "../../../hooks/input/useInput";
 import { validateEmail } from "../../../shared/utils/validate/email";
 import { ValidatePasswordLength } from "../../../shared/utils/validate/length";
 import { NewUser } from "../models/NewUser";
+import { useAppDispatch, useAppSelector } from "../../../hooks/redux/hooks";
+import { login, jwtVerify, reset, logout } from "../authSlice";
+import { LoginUser } from "../models/LoginUser.interface";
 
 const SignInFormComponent: FC = () => {
+  const dispatch = useAppDispatch();
+  const { isLoading, isAuthentication, isSuccess } = useAppSelector(
+    (state) => state.auth
+  );
+  const navigate = useNavigate();
+  const clearForm = () => {
+    emailClearHandler();
+    passwordClearHandler();
+  };
+  useEffect(() => {
+    if (isSuccess) {
+      dispatch(reset());
+      clearForm();
+    }
+  }, [isSuccess, dispatch]);
+
+  useEffect(() => {
+    if (!isAuthentication) return;
+    navigate("/");
+  }, [isAuthentication]);
+
   const {
     text: email,
     textChangeHandler: emailTextChangeHandler,
@@ -36,13 +61,16 @@ const SignInFormComponent: FC = () => {
 
     if (emailError || passwordError) return;
 
-    const newUser: NewUser = {
+    const user: LoginUser = {
       email,
       password,
     };
 
-    console.log(newUser);
+    dispatch(login(user));
   };
+  if (isLoading)
+    return <CircularProgress sx={{ marginTop: "64px" }} color="primary" />;
+
   return (
     <>
       <Box
